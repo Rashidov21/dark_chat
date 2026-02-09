@@ -30,7 +30,7 @@ async function deriveKey(
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: salt as BufferSource,
       iterations: ITERATIONS,
       hash: "SHA-256",
     },
@@ -71,7 +71,7 @@ export async function encrypt(
   const ciphertext = await crypto.subtle.encrypt(
     {
       name: ALGORITHM,
-      iv,
+      iv: iv as BufferSource,
       tagLength: 128,
     },
     key,
@@ -85,8 +85,8 @@ export async function encrypt(
   combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
 
   return {
-    ciphertext: btoa(String.fromCharCode(...combined)),
-    iv: btoa(String.fromCharCode(...iv)),
+    ciphertext: btoa(String.fromCharCode.apply(null, Array.from(combined))),
+    iv: btoa(String.fromCharCode.apply(null, Array.from(iv))),
   };
 }
 
@@ -110,7 +110,7 @@ export async function decrypt(
   const decrypted = await crypto.subtle.decrypt(
     {
       name: ALGORITHM,
-      iv,
+      iv: iv as BufferSource,
       tagLength: 128,
     },
     key,
