@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Copy, Share2, ArrowLeft, Send, MessageCircle } from "lucide-react";
+import logoImage from "../../logo.png";
 import { createRoomChannel } from "@/lib/supabase";
 import { encrypt, decrypt, generateSenderId } from "@/lib/crypto";
 import { isValidRoomId } from "@/lib/room";
@@ -198,7 +200,15 @@ export default function RoomPage() {
           <ArrowLeft className="w-5 h-5" aria-hidden />
           <span className="sr-only">Orqaga</span>
         </motion.button>
-        <div className="flex-1 flex items-center justify-center gap-1.5 min-w-0">
+        <div className="flex-1 flex items-center justify-center gap-2 min-w-0">
+          <Image
+            src={logoImage}
+            alt=""
+            width={28}
+            height={28}
+            className="rounded-lg flex-shrink-0"
+            aria-hidden
+          />
           <span className="text-sm font-medium text-white truncate">Xona {roomId}</span>
           <button
             type="button"

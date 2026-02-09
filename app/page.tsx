@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { PlusCircle, LogIn, ExternalLink } from "lucide-react";
 import { generateRoomId, isValidRoomId } from "@/lib/room";
+import logoImage from "./logo.png";
 
 export default function HomePage() {
   const router = useRouter();
@@ -43,12 +45,20 @@ export default function HomePage() {
         transition={{ duration: reduceMotion ? 0 : 0.4 }}
       >
         <motion.header
-          className="text-center"
+          className="text-center flex flex-col items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: reduceMotion ? 0 : 0.1 }}
         >
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <Image
+            src={logoImage}
+            alt="dark_chat logo"
+            width={80}
+            height={80}
+            className="rounded-2xl"
+            priority
+          />
+          <h1 className="mt-3 text-3xl font-bold text-white tracking-tight">
             dark_chat
           </h1>
           <p className="mt-2 text-dark-muted text-sm">
