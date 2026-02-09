@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { PlusCircle, LogIn, ExternalLink } from "lucide-react";
+import { PlusCircle, LogIn, ExternalLink, Github, Youtube, Send } from "lucide-react";
 import { generateRoomId, isValidRoomId } from "@/lib/room";
 import logoImage from "./logo.png";
 
@@ -76,6 +76,38 @@ export default function HomePage() {
               <ExternalLink className="w-3 h-3" aria-hidden />
             </a>
           </p>
+          <nav className="mt-4 flex flex-wrap items-center justify-center gap-3 text-dark-muted" aria-label="Havolalar">
+            <a
+              href="https://github.com/Rashidov21/dark_chat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm hover:text-white transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg"
+              title="Loyiha kodi (GitHub)"
+            >
+              <Github className="w-4 h-4" aria-hidden />
+              <span>Kod</span>
+            </a>
+            <a
+              href="https://youtube.com/@rashidov_21"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm hover:text-white transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg"
+              title="YouTube"
+            >
+              <Youtube className="w-4 h-4" aria-hidden />
+              <span>YouTube</span>
+            </a>
+            <a
+              href="https://t.me/abdurahmonrashidov"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm hover:text-white transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg"
+              title="Telegram"
+            >
+              <Send className="w-4 h-4" aria-hidden />
+              <span>Telegram</span>
+            </a>
+          </nav>
         </motion.header>
 
         <div className="w-full flex flex-col gap-4">

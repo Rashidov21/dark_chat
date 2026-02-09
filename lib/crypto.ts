@@ -92,10 +92,10 @@ export async function encrypt(
 
 /**
  * Decrypt ciphertext (base64) with AES-GCM using room secret.
+ * IV is stored inside the combined ciphertext payload.
  */
 export async function decrypt(
   ciphertextB64: string,
-  ivB64: string,
   roomSecret: string
 ): Promise<string> {
   const combined = Uint8Array.from(atob(ciphertextB64), (c) =>

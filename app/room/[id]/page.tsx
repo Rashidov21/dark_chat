@@ -21,6 +21,7 @@ type Message = {
 };
 
 const SCROLL_THRESHOLD = 150;
+const MAX_MESSAGE_LENGTH = 4096;
 
 function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString("uz-UZ", {
@@ -39,6 +40,7 @@ export default function RoomPage() {
   const [decryptError, setDecryptError] = useState<string | null>(null);
   const [copyIdStatus, setCopyIdStatus] = useState<"idle" | "copied" | "error">("idle");
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">("idle");
+  const [connectionError, setConnectionError] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const roomSecretRef = useRef<string>(roomId);
   const sendRef = useRef<((payload: { ciphertext: string; iv: string; senderId: string; timestamp: number }) => Promise<void>) | null>(null);
@@ -69,12 +71,14 @@ export default function RoomPage() {
   useEffect(() => {
     if (!roomId || !isValidRoomId(roomId)) return;
 
-    const { send, unsubscribe } = createRoomChannel(roomId, async (payload) => {
+    setConnectionError(false);
+    let unsubscribe: () => void;
+    try {
+      const channel = createRoomChannel(roomId, async (payload) => {
       const id = `${payload.senderId}-${payload.timestamp}`;
       try {
         const plaintext = await decrypt(
           payload.ciphertext,
-          payload.iv,
           roomSecretRef.current
         );
         setMessages((prev) => {
@@ -106,9 +110,14 @@ export default function RoomPage() {
         ]);
         setDecryptError("Baʼzi xabarlar shifrdan ochilmadi (notoʻgʻri xona).");
       }
-    });
-
-    sendRef.current = send;
+      }, () => setConnectionError(true));
+      sendRef.current = channel.send;
+      unsubscribe = channel.unsubscribe;
+    } catch {
+      setConnectionError(true);
+      sendRef.current = null;
+      return () => {};
+    }
     return () => {
       sendRef.current = null;
       unsubscribe();
@@ -164,6 +173,7 @@ export default function RoomPage() {
         setShareStatus("copied");
         setTimeout(() => setShareStatus("idle"), 1500);
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
         navigator.clipboard.writeText(roomLink).then(
           () => {
             setShareStatus("copied");
@@ -239,6 +249,18 @@ export default function RoomPage() {
       </header>
 
       <div className="flex-none px-3 py-2 bg-dark-surface/50 border-b border-dark-border">
+        {connectionError && (
+          <p className="text-xs text-amber-400/90 text-center mb-1">
+            Ulanishda xatolik.{" "}
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="underline focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-accent rounded"
+            >
+              Qayta urinish
+            </button>
+          </p>
+        )}
         <p className="text-xs text-dark-muted text-center">
           Chiqib ketsangiz xabarlar yoʻqoladi. Tarix saqlanmaydi.
         </p>
@@ -305,12 +327,14 @@ export default function RoomPage() {
         onSubmit={handleSend}
         className="flex-none p-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-dark-border bg-dark-surface"
       >
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Xabar yozing…"
+            maxLength={MAX_MESSAGE_LENGTH}
             className="flex-1 min-h-[44px] py-3 px-4 rounded-xl bg-dark-bg border border-dark-border
                        text-white placeholder-dark-muted focus:outline-none focus-visible:ring-2
                        focus-visible:ring-dark-accent/50 focus-visible:border-dark-accent"
@@ -328,6 +352,10 @@ export default function RoomPage() {
             <Send className="w-4 h-4" aria-hidden />
             <span>Yuborish</span>
           </motion.button>
+          </div>
+          <p className="text-[10px] text-dark-muted text-right px-1">
+            {input.length}/{MAX_MESSAGE_LENGTH}
+          </p>
         </div>
       </form>
     </main>

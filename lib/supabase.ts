@@ -31,11 +31,12 @@ export type BroadcastPayload = {
 
 /**
  * One channel per room: subscribe and send on the same channel (required by Supabase).
- * Returns unsubscribe and send helpers.
+ * Returns unsubscribe and send helpers. onError called on subscription/channel failure.
  */
 export function createRoomChannel(
   roomId: string,
-  onMessage: (payload: BroadcastPayload) => void
+  onMessage: (payload: BroadcastPayload) => void,
+  onError?: () => void
 ): { send: (payload: BroadcastPayload) => Promise<void>; unsubscribe: () => void } {
   const channel = getSupabase().channel(`room:${roomId}`, {
     config: {
@@ -49,7 +50,11 @@ export function createRoomChannel(
     }
   });
 
-  channel.subscribe();
+  channel.subscribe((status) => {
+    if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+      onError?.();
+    }
+  });
 
   return {
     async send(payload: BroadcastPayload) {
