@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const siteUrl = "https://dark-chat-nine.vercel.app";
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="uz-Latn" suppressHydrationWarning>
       <body className="min-h-screen bg-dark-bg font-sans antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );
